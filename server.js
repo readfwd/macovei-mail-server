@@ -54,7 +54,6 @@ app.use(bodyParser.urlencoded({
 );
 
 app.all('*', function (request, response, next) {
-  console.log('test');
   response.header("Access-Control-Allow-Origin", "*");
   response.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
   next();

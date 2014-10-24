@@ -3,6 +3,10 @@ var bodyParser = require('body-parser');
 var sendgrid = require('sendgrid')(process.env.SENDGRID_USER, process.env.SENDGRID_PASS);
 var app = express();
 var http = require('http').Server(app);
+var monk = require('monk');
+
+var url = process.env.COMPOSEIO_DB, db;
+
 
 var getHTML = function(title, country) {
   return [
@@ -33,6 +37,28 @@ var destinations = [
 
 var emailRegxp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+if (url) {
+  db = monk(url);
+
+  db.on('error', function (error) {
+    console.log('ComposeIO connection error: ', error);
+  });
+
+  var letters = db.get('letters');
+};
+
+function log (object) {
+  if (db) {
+    letters.insert(object)
+      .error(function (error) {
+        console.log('ComposeIO connection error: ', error);
+      });
+  }
+  if (!db || process.env.DEBUG) {
+    console.log(object)
+  }
+}
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -46,8 +72,6 @@ app.all('*', function (request, response, next) {
 });
 
 app.post('/send', function (request, response) {
-
-
   if (typeof request.body.title != "number" || typeof request.body.destination != "number") {
     response.status(500).end();
     return;
@@ -72,7 +96,15 @@ app.post('/send', function (request, response) {
     return;
   }
 
-  console.log(typeof request.body.title, typeof request.body.destination);
+  letters.insert(
+    {
+      "ip": request.ip,
+      "sendTo": request.body.sendTo,
+      "destination": request.body.destination,
+      "title": request.body.title
+    }
+  );
+
   sendgrid.send({
   to:       request.body.sendTo,
   from:     'no-reply@macoveipresedinte.ro',

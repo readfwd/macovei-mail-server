@@ -60,7 +60,7 @@ app.all('*', function (request, response, next) {
   next();
 });
 
-app.post('/send', function (request, response) {
+app.post('/send', function (request, cors, response) {
   if (typeof request.body.title != "number" || typeof request.body.destination != "number") {
     console.log('dest and title error');
     response.status(500).end();

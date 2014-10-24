@@ -47,18 +47,6 @@ if (url) {
   var letters = db.get('letters');
 };
 
-function log (object) {
-  if (db) {
-    letters.insert(object)
-      .error(function (error) {
-        console.log('ComposeIO connection error: ', error);
-      });
-  }
-  if (!db || process.env.DEBUG) {
-    console.log(object)
-  }
-}
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -67,6 +55,7 @@ app.use(bodyParser.urlencoded({
 
 app.all('*', function (request, response, next) {
   response.header("Access-Control-Allow-Origin", "*");
+  response.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   response.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
   next();
 });

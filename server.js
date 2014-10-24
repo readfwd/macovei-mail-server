@@ -62,6 +62,7 @@ app.all('*', function (request, response, next) {
 
 app.post('/send', function (request, response) {
   if (typeof request.body.title != "number" || typeof request.body.destination != "number") {
+    console.log('dest and title error');
     response.status(500).end();
     return;
   }
@@ -69,6 +70,7 @@ app.post('/send', function (request, response) {
   if (request.body.title < titles.length) {
     request.body.title = titles[request.body.title];
   } else {
+    console.log('title error');
     response.status(500).end();
     return;
   }
@@ -76,11 +78,13 @@ app.post('/send', function (request, response) {
   if (request.body.destination < destinations.length) {
     request.body.destination = destinations[request.body.destination];
   } else {
+    console.log('dest error');
     response.status(500).end();
     return;
   }
 
   if (!emailRegxp.test(request.body.sendTo)) {
+    console.log('email error');
     response.status(500).end();
     return;
   }

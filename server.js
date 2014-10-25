@@ -1,3 +1,4 @@
+var newrelic = require('newrelic');
 var express = require('express');
 var bodyParser = require('body-parser');
 var sendgrid = require('sendgrid')(process.env.SENDGRID_USER, process.env.SENDGRID_PASS);

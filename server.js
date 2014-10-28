@@ -17,7 +17,7 @@ var getHTML = function(title, country) {
     '  </tr>',
     '  <tr>',
     '    <td rowspan="2"><img src="cid:leftSide" width="66" height="502" style="display: block"></td>',
-    '    <td height="433">', title, ',<br><br>Mereu ai crezut în mine. Dar mă uit in jurul meu si văd că viitorul pe care mi-l doresc eu nu are nicio șansă in România. Așa că m-am hotărât să plec în ', country.toLowerCase().replace(/^.|\s\S/g, function(a) { return a.toUpperCase(); }) ,'.<br><br>O să-mi fie dor de tine, și ție de mine. Dar țara asta pare să fie prea coruptă ca eu să mai pot reuși să fac ceva pe meritul meu, fără pile și fără șpagă. Că nimeni nu pleacă de drag.<br>Să știi, totuși, că mai există un singur om care îmi dă speranță. Este o personă care mi-a demonstrat că vrea ceea ce vreau și eu. De aceea te rog din suflet ca pe 2 noiembrie să crezi iar în mine și să votezi cu Monica Macovei. <br><br>Vă iubesc și ne vedem cât de curând!',
+    '    <td height="433">', title, ',<br><br>Mereu ai crezut în mine. Dar mă uit in jurul meu si văd că viitorul pe care mi-l doresc eu nu are nicio șansă in România. Așa că m-am hotărât să plec în ', country.toLowerCase().replace(/^.|\s\S/g, function(a) { return a.toUpperCase(); }) ,'.<br><br>O să-mi fie dor de tine, și ție de mine. Dar țara asta pare să fie prea coruptă ca eu să mai pot reuși să fac ceva pe meritul meu, fără pile și fără șpagă. Că nimeni nu pleacă de drag.<br>Să știi, totuși, că mai există un singur om care îmi dă speranță. Este o persoană care mi-a demonstrat că vrea ceea ce vreau și eu. De aceea te rog din suflet ca pe 2 noiembrie să crezi iar în mine și să votezi cu Monica Macovei. <br><br>Vă iubesc și ne vedem cât de curând!',
     '    </td>',
     '    <td height="502" rowspan="2"><img src="cid:location" width="418" style="display: block"></td>',
     '  </tr>',
@@ -83,8 +83,15 @@ app.post('/send', function (request, response) {
     return;
   }
 
+
   if (!emailRegxp.test(request.body.sendTo)) {
     console.log('email error');
+    response.status(500).end();
+    return;
+  }
+
+  if (!emailRegxp.test(request.body.source)) {
+    console.log('source email error');
     response.status(500).end();
     return;
   }
@@ -92,6 +99,7 @@ app.post('/send', function (request, response) {
   letters.insert(
     {
       "ip": request.ip,
+      "from:": request.body.source,
       "sendTo": request.body.sendTo,
       "destination": request.body.destination,
       "title": request.body.title
@@ -100,8 +108,8 @@ app.post('/send', function (request, response) {
 
   sendgrid.send({
   to:       request.body.sendTo,
-  from:     'no-reply@macoveipresedinte.ro',
-  subject:  'Ai primit o scrisoare nouă!',
+  from:     request.body.source,
+  subject:  'M-am hotarat sa plec din tara.',
   files: [
     {
       cid: 'up',
